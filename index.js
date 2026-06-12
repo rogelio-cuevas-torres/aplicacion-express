@@ -3,6 +3,8 @@ import { Database } from 'bun:sqlite'
 
 // Abre la base de datos
 const db = new Database('./base.sqlite3')
+
+// Crea la tabla todos si no existe
 db.run(`CREATE TABLE IF NOT EXISTS todos (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     todo TEXT NOT NULL,
@@ -19,8 +21,9 @@ app.post('/login', async (c) => {
     return c.json({ status: 'ok' })
 })
 
-app.post('/insert', async (c) => {
+app.post('/agrega_todo', async (c) => {
     let body
+
     try {
         body = await c.req.json()
     } catch {
@@ -36,7 +39,15 @@ app.post('/insert', async (c) => {
     try {
         const stmt = db.prepare('INSERT INTO todos (todo) VALUES (?)')
         const result = stmt.run(todo)
-        return c.json({ id: Number(result.lastInsertRowid), message: 'Insert was successful' }, 201)
+
+        return c.json(
+            {
+                id: Number(result.lastInsertRowid),
+                todo: todo,
+                message: 'Todo agregado correctamente'
+            },
+            201
+        )
     } catch (err) {
         return c.json({ error: err.message }, 500)
     }

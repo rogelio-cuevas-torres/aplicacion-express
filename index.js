@@ -53,6 +53,21 @@ app.post('/agrega_todo', async (c) => {
     }
 })
 
+app.get('/todos', (c) => {
+    try {
+        const todos = db
+            .query('SELECT id, todo, created_at FROM todos ORDER BY id DESC')
+            .all()
+
+        return c.json({
+            status: 'ok',
+            data: todos
+        })
+    } catch (err) {
+        return c.json({ error: err.message }, 500)
+    }
+})
+
 export { app, db }
 
 export default {
